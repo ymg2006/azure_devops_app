@@ -12,7 +12,9 @@ class _SettingsScreen extends StatelessWidget {
       init: ctrl.init,
       title: 'Settings',
       notifier: ctrl.directories,
-      actions: [IconButton(onPressed: ctrl.shareApp, icon: Icon(DevOpsIcons.share))],
+      actions: [
+        IconButton(onPressed: ctrl.shareApp, icon: Icon(DevOpsIcons.share)),
+      ],
       builder: (directories) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -23,7 +25,9 @@ class _SettingsScreen extends StatelessWidget {
               children: [
                 Text(
                   'Git username',
-                  style: context.textTheme.titleSmall!.copyWith(color: context.colorScheme.onSecondary),
+                  style: context.textTheme.titleSmall!.copyWith(
+                    color: context.colorScheme.onSecondary,
+                  ),
                 ),
                 const SizedBox(height: 10),
                 Text(ctrl.gitUsername),
@@ -40,7 +44,9 @@ class _SettingsScreen extends StatelessWidget {
                       const SizedBox(height: 10),
                       Text(
                         'Current plan',
-                        style: context.textTheme.titleSmall!.copyWith(color: context.colorScheme.onSecondary),
+                        style: context.textTheme.titleSmall!.copyWith(
+                          color: context.colorScheme.onSecondary,
+                        ),
                       ),
                       const SizedBox(height: 10),
                       Text(entitlementName),
@@ -121,12 +127,15 @@ class _SettingsScreen extends StatelessWidget {
           SectionHeader(text: 'Developer'),
           NavigationButton(
             child: Link(
-              uri: Uri.parse('https://github.com/PurpleSoftSrl/azure_devops_app'),
+              uri: Uri.parse('https://github.com/ymg2006/azure_devops_app'),
               builder: (_, link) => InkWell(
                 onTap: link,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: const [Text('GitHub repository'), Icon(DevOpsIcons.github)],
+                  children: const [
+                    Text('GitHub repository'),
+                    Icon(DevOpsIcons.github),
+                  ],
                 ),
               ),
             ),
@@ -134,12 +143,17 @@ class _SettingsScreen extends StatelessWidget {
           const SizedBox(height: 20),
           NavigationButton(
             child: Link(
-              uri: Uri.parse('https://www.purplesoft.io?utm_source=azdevops_app&utm_medium=app&utm_campaign=azdevops'),
+              uri: Uri.parse(
+                'https://www.purplesoft.io?utm_source=azdevops_app&utm_medium=app&utm_campaign=azdevops',
+              ),
               builder: (_, link) => InkWell(
                 onTap: () => ctrl.openPurplesoftWebsite(link),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: const [Text('Made with \u2764 by PurpleSoft Srl'), Icon(DevOpsIcons.link)],
+                  children: const [
+                    Text('Made with \u2764 by PurpleSoft Srl'),
+                    Icon(DevOpsIcons.link),
+                  ],
                 ),
               ),
             ),
@@ -149,7 +163,10 @@ class _SettingsScreen extends StatelessWidget {
             onTap: ctrl.openAppStore,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: const [Text('Leave a review'), Icon(Icons.rate_review_outlined)],
+              children: const [
+                Text('Leave a review'),
+                Icon(Icons.rate_review_outlined),
+              ],
             ),
           ),
           const SizedBox(height: 20),
@@ -173,7 +190,10 @@ class _SettingsScreen extends StatelessWidget {
             onTap: ctrl.clearLocalStorage,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: const [Text('Clear cache'), Icon(Icons.cleaning_services)],
+              children: const [
+                Text('Clear cache'),
+                Icon(Icons.cleaning_services),
+              ],
             ),
           ),
           SectionHeader(text: 'Policies'),
@@ -195,7 +215,9 @@ class _SettingsScreen extends StatelessWidget {
           const SizedBox(height: 40),
           Text(
             'Version ${ctrl.appVersion}',
-            style: context.textTheme.titleSmall!.copyWith(color: context.colorScheme.onSecondary),
+            style: context.textTheme.titleSmall!.copyWith(
+              color: context.colorScheme.onSecondary,
+            ),
           ),
         ],
       ),
