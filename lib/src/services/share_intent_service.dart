@@ -16,10 +16,15 @@ class ShareIntentService with AppLogger {
 
   static ShareIntentService? instance;
 
-  static const _shareExtensionChannel = MethodChannel('io.purplesoft.azuredevops.shareextension');
+  static const _shareExtensionChannel = MethodChannel(
+    'io.ymg2006.azuredevops.shareextension',
+  );
 
   Future<void> maybeHandleSharedUrl() async {
-    final url = (await _shareExtensionChannel.invokeMethod('getSharedUrl')) as String? ?? '';
+    final url =
+        (await _shareExtensionChannel.invokeMethod('getSharedUrl'))
+            as String? ??
+        '';
     logDebug('shared url: $url');
     if (url.isEmpty) return;
 

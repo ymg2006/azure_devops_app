@@ -1,4 +1,4 @@
-package io.purplesoft.azuredevops
+package io.ymg2006.azuredevops
 
 import android.util.Log
 import android.content.Intent;
@@ -14,7 +14,7 @@ import java.net.URL
 class MainActivity : FlutterActivity(), MethodCallHandler {
     private var sharedUrl = ""
     private val allowedDomains = listOf("dev.azure.com", "visualstudio.com")
-    private val CHANNEL = "io.purplesoft.azuredevops.shareextension"
+    private val CHANNEL = "io.ymg2006.azuredevops.shareextension"
     private val tag = "AzDevopsMainActivity"
 
     override fun onCreate(savedInstanceState: Bundle?) {

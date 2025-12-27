@@ -10,7 +10,7 @@ import UniformTypeIdentifiers
 
 class ShareViewController: UIViewController {
     private var appURLString =
-        "azdevopsshareext.io.purplesoft.azuredevops://share?url="
+        "azdevopsshareext.io.ymg2006.azuredevops://share?url="
     private let allowedDomains = ["visualstudio.com", "dev.azure.com"]
 
     override func viewDidAppear(_ animated: Bool) {

@@ -13,14 +13,14 @@ import MSAL
     }
     
     override func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
-        if (url.absoluteString.hasPrefix("azdevopsshareext.io.purplesoft.azuredevops://share?")) {
-            let cleanUrlString = url.absoluteString.replacingOccurrences(of: "azdevopsshareext.io.purplesoft.azuredevops://share?", with: "sharedUrl?")
+        if (url.absoluteString.hasPrefix("azdevopsshareext.io.ymg2006.azuredevops://share?")) {
+            let cleanUrlString = url.absoluteString.replacingOccurrences(of: "azdevopsshareext.io.ymg2006.azuredevops://share?", with: "sharedUrl?")
             let cleanUrl = URL(string: cleanUrlString)!
             print("AppDelegate: Handling URL \(cleanUrl)")
             return super.application(app, open: cleanUrl, options:options)
         }
 
-        if (url.absoluteString.hasPrefix("msauth.io.purplesoft.azuredevops")) {
+        if (url.absoluteString.hasPrefix("msauth.io.ymg2006.azuredevops")) {
             return MSALPublicClientApplication.handleMSALResponse(url, sourceApplication: nil)
         }
         

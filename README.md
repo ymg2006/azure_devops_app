@@ -24,7 +24,7 @@ Follow [this guide](https://learn.microsoft.com/en-us/azure/devops/organizations
 # App Downloads
 
 To try the app you can download it from your favorite app store:
-* [Google Play](https://play.google.com/store/apps/details?id=io.purplesoft.azuredevops)
+* [Google Play](https://play.google.com/store/apps/details?id=io.ymg2006.azuredevops)
 * [Apple App Store](https://apps.apple.com/us/app/az-devops/id1666994628)
 
 # Installation from source

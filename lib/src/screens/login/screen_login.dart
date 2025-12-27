@@ -119,35 +119,6 @@ class _LoginScreen extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 20),
-            Link(
-              uri: Uri.parse(
-                'https://www.purplesoft.io?utm_source=azdevops_app&utm_medium=app&utm_campaign=azdevops',
-              ),
-              builder: (_, link) => InkWell(
-                onTap: () => ctrl.openPurplesoftWebsite(link),
-                child: Text.rich(
-                  textAlign: TextAlign.center,
-                  TextSpan(
-                    children: [
-                      TextSpan(
-                        text: 'Made with \u2764 by ',
-                        style: context.textTheme.bodyMedium!.copyWith(
-                          fontWeight: FontWeight.w500,
-                          fontFamily: AppTheme.defaultFont,
-                        ),
-                      ),
-                      TextSpan(
-                        text: 'PurpleSoft Srl',
-                        style: context.textTheme.bodyMedium!.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
           ],
         ),
       ),

@@ -142,24 +142,6 @@ class _SettingsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           NavigationButton(
-            child: Link(
-              uri: Uri.parse(
-                'https://www.purplesoft.io?utm_source=azdevops_app&utm_medium=app&utm_campaign=azdevops',
-              ),
-              builder: (_, link) => InkWell(
-                onTap: () => ctrl.openPurplesoftWebsite(link),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: const [
-                    Text('Made with \u2764 by PurpleSoft Srl'),
-                    Icon(DevOpsIcons.link),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 20),
-          NavigationButton(
             onTap: ctrl.openAppStore,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

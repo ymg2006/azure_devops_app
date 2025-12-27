@@ -23,14 +23,17 @@ class _SettingsController with ShareMixin, AppLogger {
 
   void shareApp() {
     final appUrl = Platform.isAndroid
-        ? 'https://play.google.com/store/apps/details?id=io.purplesoft.azuredevops'
+        ? 'https://play.google.com/store/apps/details?id=io.ymg2006.azuredevops'
         : 'https://apps.apple.com/app/apple-store/id1666994628?pt=120276127&ct=app&mt=8';
 
     shareUrl(appUrl);
   }
 
   Future<void> logout() async {
-    final confirm = await OverlayService.confirm('Attention', description: 'Do you really want to logout?');
+    final confirm = await OverlayService.confirm(
+      'Attention',
+      description: 'Do you really want to logout?',
+    );
     if (!confirm) return;
 
     await api.logout();
@@ -78,8 +81,10 @@ class _SettingsController with ShareMixin, AppLogger {
       title: 'Switch directory',
       isScrollControlled: true,
       heightPercentage: .6,
-      builder: (context) =>
-          _SwitchDirectoryWidget(directories: directories.value?.data ?? [], onSwitch: _switchOrganization),
+      builder: (context) => _SwitchDirectoryWidget(
+        directories: directories.value?.data ?? [],
+        onSwitch: _switchOrganization,
+      ),
     );
   }
 
@@ -91,7 +96,9 @@ class _SettingsController with ShareMixin, AppLogger {
       // ignore
     }
 
-    final loginRes = await MsalService().login(authority: 'https://login.microsoftonline.com/${tenant.id}');
+    final loginRes = await MsalService().login(
+      authority: 'https://login.microsoftonline.com/${tenant.id}',
+    );
 
     if (loginRes != null) unawaited(_loginAndNavigate(loginRes));
   }
@@ -116,7 +123,10 @@ class _SettingsController with ShareMixin, AppLogger {
 
     final isLogged = await api.login(loginResponse.accessToken);
 
-    final isFailed = [LoginStatus.failed, LoginStatus.unauthorized].contains(isLogged);
+    final isFailed = [
+      LoginStatus.failed,
+      LoginStatus.unauthorized,
+    ].contains(isLogged);
 
     logAnalytics('switch_directory_${isFailed ? 'failed' : 'success'}', {});
 
@@ -130,7 +140,9 @@ class _SettingsController with ShareMixin, AppLogger {
       return _switchDirectoryErrorAlert();
     }
 
-    final directoryProjects = storage.getTenantChosenProjects(loginResponse.tenantId);
+    final directoryProjects = storage.getTenantChosenProjects(
+      loginResponse.tenantId,
+    );
 
     if (directoryProjects.isNotEmpty) {
       await _chooseOrg(orgsRes.data!);
@@ -200,7 +212,9 @@ class _SettingsController with ShareMixin, AppLogger {
         child: AppMarkdownWidget(
           data: str,
           shrinkWrap: false,
-          styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(p: context.textTheme.titleSmall),
+          styleSheet: MarkdownStyleSheet.fromTheme(
+            Theme.of(context),
+          ).copyWith(p: context.textTheme.titleSmall),
           paddingBuilders: {'h2': _H2PaddingBuilder()},
         ),
       ),
@@ -212,7 +226,9 @@ class _SettingsController with ShareMixin, AppLogger {
   }
 
   void openTermsAndConditions() {
-    launchUrlString('https://www.apple.com/legal/internet-services/itunes/dev/stdeula/');
+    launchUrlString(
+      'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/',
+    );
   }
 }
 
