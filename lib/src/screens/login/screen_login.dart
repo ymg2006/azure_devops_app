@@ -1,4 +1,4 @@
-part of login;
+part of 'base_login.dart';
 
 class _LoginScreen extends StatelessWidget {
   const _LoginScreen(this.ctrl, this.parameters);
