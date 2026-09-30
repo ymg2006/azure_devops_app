@@ -260,6 +260,10 @@ abstract class AzureApiService {
 
   Future<ApiResponse<bool>> rejectPipelineApproval({required Approval approval, required String projectId});
 
+  /// Returns the graph descriptors that identify the current user as an approver:
+  /// the user's own descriptor plus every group the user belongs to (transitively).
+  Future<ApiResponse<Set<String>>> getCurrentUserApproverDescriptors();
+
   Future<ApiResponse<PipelineWithTimeline>> getPipeline({required String projectName, required int id});
 
   Future<ApiResponse<String>> getPipelineTaskLogs({
@@ -417,6 +421,10 @@ class AzureApiServiceImpl with AppLogger implements AzureApiService {
   @override
   List<GraphUser> get allUsers => _allUsers;
   List<GraphUser> _allUsers = [];
+
+  /// Cached set of graph descriptors identifying the current user as an approver
+  /// (own descriptor + all groups they belong to). Computed at most once per session.
+  Set<String>? _userApproverDescriptors;
 
   @override
   bool get isImageUnauthorized => _isImageUnauthorized;
@@ -868,15 +876,15 @@ class AzureApiServiceImpl with AppLogger implements AzureApiService {
     }
 
     if (area != null) {
-      query.add(" [System.AreaPath] = '${area.escapedAreaPath}' ");
+      query.add(" [System.AreaPath] = '${_wiqlLiteral(area.escapedAreaPath)}' ");
     }
 
     if (iteration != null) {
-      query.add(" [System.IterationPath] = '${iteration.escapedIterationPath}' ");
+      query.add(" [System.IterationPath] = '${_wiqlLiteral(iteration.escapedIterationPath)}' ");
     }
 
     if (title != null) {
-      query.add(" [System.Title] Contains '$title' ");
+      query.add(" [System.Title] Contains '${_wiqlLiteral(title)}' ");
     }
 
     if (id != null) {
@@ -918,20 +926,26 @@ class AzureApiServiceImpl with AppLogger implements AzureApiService {
     return ApiResponse.ok(GetWorkItemsResponse.fromResponse(allWorkItemsRes));
   }
 
+  /// WIQL escapes a single quote by DOUBLING it (`'` → `''`). Every user value
+  /// interpolated into a `'...'` WIQL literal MUST go through this, or an apostrophe
+  /// in an iteration/area path, title, state or assignee silently breaks the query
+  /// (malformed WIQL → 400 → the filtered list quietly fails — issue #69).
+  String _wiqlLiteral(String v) => v.replaceAll("'", "''");
+
   String _getMultipleFilter<T>(String variable, Iterable<T> filters, String Function(T) label) {
     var query = '';
 
     final filterList = filters.toList();
 
-    if (filterList.length == 1) return " $variable = '${label(filterList.first)}' ";
+    if (filterList.length == 1) return " $variable = '${_wiqlLiteral(label(filterList.first))}' ";
 
     for (var i = 0; i < filterList.length; i++) {
       if (i == 0) {
-        query += " ( $variable = '${label(filterList[i])}' OR ";
+        query += " ( $variable = '${_wiqlLiteral(label(filterList[i]))}' OR ";
       } else if (i == filterList.length - 1) {
-        query += " $variable = '${label(filterList[i])}' ) ";
+        query += " $variable = '${_wiqlLiteral(label(filterList[i]))}' ) ";
       } else {
-        query += " $variable = '${label(filterList[i])}' OR ";
+        query += " $variable = '${_wiqlLiteral(label(filterList[i]))}' OR ";
       }
     }
 
@@ -1622,9 +1636,13 @@ class AzureApiServiceImpl with AppLogger implements AzureApiService {
       },
     );
 
-    if (itemsRes.isError) return ApiResponse.error(itemsRes);
-
     final board = BoardDetail.fromResponse(boardRes);
+
+    // [issue #73] The kanban item source is an INTERNAL data-provider
+    // (contribution/hierarchyQuery, ms.vss-work-web.*) that a PAT can't call — it
+    // 401s. Degrade gracefully: show the board columns/structure (from the accessible
+    // boards API) with no cards, instead of failing the whole Boards screen.
+    if (itemsRes.isError) return ApiResponse.ok(BoardDetailWithItems(board: board, items: []));
 
     final itemIds = BoardItemsResponse.fromResponse(itemsRes).data.content.boardModel.itemSource.payload.rows;
     if (itemIds.isEmpty) return ApiResponse.ok(BoardDetailWithItems(board: board, items: []));
@@ -1681,8 +1699,10 @@ class AzureApiServiceImpl with AppLogger implements AzureApiService {
     );
     if (sprintRes.isError) return ApiResponse.error(sprintRes);
 
+    // [issue #73] _sprints is an INTERNAL web-UI (FPS) route a PAT can't call — it
+    // 401s. Degrade gracefully: build the sprint WITHOUT its kanban columns/types
+    // instead of failing the whole Sprint screen — items + iteration dates still load.
     final columnsRes = await _get('$_basePath/$projectName/_sprints?__rt=fps&__ver=2');
-    if (columnsRes.isError) return ApiResponse.error(columnsRes);
 
     final itemsRes = await _get(
       '$_basePath/$projectName/$teamId/_apis/work/teamsettings/iterations/$sprintId/workitems?$_apiVersion',
@@ -1695,13 +1715,13 @@ class AzureApiServiceImpl with AppLogger implements AzureApiService {
 
     final sprint = Sprint.fromResponse(sprintRes);
 
-    final sprintDetail = SprintDetailResponse.fromResponse(columnsRes);
+    final sprintDetail = columnsRes.isError ? null : SprintDetailResponse.fromResponse(columnsRes);
 
     final teamDefaultArea = teamAreasRes.isError ? null : TeamAreasResponse.fromResponse(teamAreasRes).defaultValue;
 
     sprint
-      ..columns = sprintDetail.states.map((s) => BoardColumn.fromState(state: s)).toList()
-      ..types = sprintDetail.types
+      ..columns = sprintDetail?.states.map((s) => BoardColumn.fromState(state: s)).toList()
+      ..types = sprintDetail?.types
       ..teamDefaultArea = teamDefaultArea;
 
     final itemIds = SprintItemsResponse.fromResponse(itemsRes).map((i) => i.target.id);
@@ -2201,9 +2221,9 @@ class AzureApiServiceImpl with AppLogger implements AzureApiService {
     );
     if (approvalsRes.isError) return ApiResponse.error(approvalsRes);
 
-    final approvals = GetPipelineApprovalsResponse.fromResponse(
-      approvalsRes,
-    ).where((a) => a.pipeline.owner.id == pipeline.id).toList();
+    final approvals = GetPipelineApprovalsResponse.fromResponse(approvalsRes)
+        .where((a) => a.pipeline.owner.id == pipeline.id)
+        .toList();
 
     return ApiResponse.ok(approvals);
   }
@@ -2472,6 +2492,37 @@ class AzureApiServiceImpl with AppLogger implements AzureApiService {
   }
 
   @override
+  Future<ApiResponse<Set<String>>> getCurrentUserApproverDescriptors() async {
+    if (_userApproverDescriptors != null) return ApiResponse.ok(_userApproverDescriptors!);
+
+    if (_allUsers.isEmpty) await _getUsers();
+
+    final email = user?.emailAddress;
+    final descriptor = _allUsers.firstWhereOrNull((u) => u.mailAddress == email)?.descriptor;
+    if (descriptor == null) return ApiResponse.ok(<String>{});
+
+    final descriptors = <String>{descriptor};
+    // Walk the membership graph upwards to collect every (transitive) group the user belongs to.
+    final toVisit = <String>[descriptor];
+    while (toVisit.isNotEmpty) {
+      final current = toVisit.removeLast();
+      final res = await _get(
+        '$_usersBasePath/$_organization/_apis/graph/memberships/$current?direction=up&$_apiVersion-preview',
+      );
+      if (res.isError) continue;
+
+      final value = (jsonDecode(res.body) as Map<String, dynamic>)['value'] as List<dynamic>? ?? [];
+      for (final membership in value) {
+        final container = (membership as Map<String, dynamic>)['containerDescriptor'] as String?;
+        if (container != null && descriptors.add(container)) toVisit.add(container);
+      }
+    }
+
+    _userApproverDescriptors = descriptors;
+    return ApiResponse.ok(descriptors);
+  }
+
+  @override
   Future<ApiResponse<GraphUser>> getUserFromDisplayName({required String name}) async {
     if (_allUsers.isEmpty) await _getUsers();
 
@@ -2509,6 +2560,7 @@ class AzureApiServiceImpl with AppLogger implements AzureApiService {
     _organization = '';
     _chosenProjects = null;
     _allUsers.clear();
+    _userApproverDescriptors = null;
     _user = null;
     dispose();
   }
