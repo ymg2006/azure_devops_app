@@ -1,4 +1,4 @@
-part of settings;
+part of 'base_settings.dart';
 
 class _SettingsScreen extends StatelessWidget {
   const _SettingsScreen(this.ctrl, this.parameters);
@@ -56,19 +56,21 @@ class _SettingsScreen extends StatelessWidget {
                 : const SizedBox(),
           ),
           SectionHeader(text: 'App management'),
-          NavigationButton(
-            onTap: ctrl.goToChooseSubscription,
-            child: Row(
-              children: [
-                Icon(DevOpsIcons.crown),
-                const SizedBox(width: 20),
-                Text('Choose plan', style: context.textTheme.bodyLarge),
-                const Spacer(),
-                Icon(Icons.arrow_forward_ios),
-              ],
+          if (usePurchases) ...[
+            NavigationButton(
+              onTap: ctrl.goToChooseSubscription,
+              child: Row(
+                children: [
+                  Icon(DevOpsIcons.crown),
+                  const SizedBox(width: 20),
+                  Text('Choose plan', style: context.textTheme.bodyLarge),
+                  const Spacer(),
+                  Icon(Icons.arrow_forward_ios),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 20),
+            const SizedBox(height: 20),
+          ],
           NavigationButton(
             onTap: ctrl.seeChosenProjects,
             child: Row(
@@ -81,21 +83,51 @@ class _SettingsScreen extends StatelessWidget {
               ],
             ),
           ),
-          if (directories.length > 1) ...[
-            const SizedBox(height: 20),
-            NavigationButton(
-              onTap: ctrl.chooseDirectory,
-              child: Row(
-                children: [
-                  Icon(DevOpsIcons.repository),
-                  const SizedBox(width: 20),
-                  Text('Switch directory', style: context.textTheme.bodyLarge),
-                  const Spacer(),
-                  Icon(Icons.arrow_forward_ios),
-                ],
-              ),
+          const SizedBox(height: 20),
+          NavigationButton(
+            onTap: ctrl.changeDefaultCollection,
+            child: Row(
+              children: [
+                Icon(Icons.dns_outlined),
+                const SizedBox(width: 20),
+                Text('Change default collection', style: context.textTheme.bodyLarge),
+                const Spacer(),
+                Icon(Icons.arrow_forward_ios),
+              ],
             ),
-          ],
+          ),
+          const SizedBox(height: 20),
+          NavigationButton(
+            onTap: ctrl.manageConnections,
+            child: Row(
+              children: [
+                Icon(Icons.cloud_queue),
+                const SizedBox(width: 20),
+                Text(
+                  'Azure DevOps Connections',
+                  style: context.textTheme.bodyLarge,
+                ),
+                const Spacer(),
+                Icon(Icons.arrow_forward_ios),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+          NavigationButton(
+            onTap: ctrl.chooseDirectory,
+            child: Row(
+              children: [
+                Icon(DevOpsIcons.repository),
+                const SizedBox(width: 20),
+                Text(
+                  'Switch tenant / directory',
+                  style: context.textTheme.bodyLarge,
+                ),
+                const Spacer(),
+                Icon(Icons.arrow_forward_ios),
+              ],
+            ),
+          ),
           const SizedBox(height: 20),
           NavigationButton(
             onTap: ctrl.chooseAccount,
