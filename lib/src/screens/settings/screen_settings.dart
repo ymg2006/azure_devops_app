@@ -159,7 +159,7 @@ class _SettingsScreen extends StatelessWidget {
           SectionHeader(text: 'Developer'),
           NavigationButton(
             child: Link(
-              uri: Uri.parse('https://github.com/ymg2006/azure_devops_app'),
+              uri: Uri.parse('https://github.com/PurpleSoftSrl/azure_devops_app'),
               builder: (_, link) => InkWell(
                 onTap: link,
                 child: Row(

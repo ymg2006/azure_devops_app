@@ -94,7 +94,7 @@ class _LoginScreen extends StatelessWidget {
             ),
             const SizedBox(height: 100),
             Link(
-              uri: Uri.parse('https://github.com/ymg2006/azure_devops_app'),
+              uri: Uri.parse('https://github.com/PurpleSoftSrl/azure_devops_app'),
               builder: (_, link) => InkWell(
                 onTap: link,
                 child: Text.rich(
